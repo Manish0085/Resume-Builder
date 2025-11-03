@@ -1,0 +1,58 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: resume
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/practicedb
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update   # options: none | update | create | create-drop
+    show-sql: true       # logs SQL queries in console
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+  mail:
+    host: smtp-relay.brevo.com
+    port: 587
+    username: ${BREVO_USERNAME}
+    password: ${BREVO_PASSWORD}   # stored securely in environment variable
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+        transport:
+          protocol: smtp
+    default-encoding: UTF-8
+
+# Logging Configuration
+logging:
+  level:
+    org.springframework: INFO
+    org.hibernate.SQL: DEBUG
+
+# Custom App Properties
+app:
+  email:
+    from: manishk57107@gmail.com
+    verification-link-expiry-hours: 24
+
+  base:
+    url: http://localhost:8081
+
+
+
+
+
+
+
+
