@@ -138,4 +138,26 @@ public class AuthServiceImpl implements AuthService {
         return response;
     }
 
+    @Override
+    public void resendVerification(String email) {
+        User user = userRepo.findByEmail(email).orElseThrow(() ->
+                new RuntimeException("User not found"));
+
+        if (user.isEmailVerified())
+            throw new RuntimeException("Email is already verified");
+
+        user.setEmailVerificationToken(UUID.randomUUID().toString());
+        user.setVerificationExpires(LocalDateTime.now().plusHours(24));
+
+        userRepo.save(user);
+
+        sendVerificationEmail(user);
+    }
+
+    @Override
+    public AuthResponse getProfile(Object principal) {
+        User existingUser = (User) principal;
+        return toResponse(existingUser);
+    }
+
 }

@@ -14,11 +14,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.build.resume.util.AppConstants.*;
@@ -63,10 +65,33 @@ public class AuthController {
         return ResponseEntity.of(Optional.ofNullable(response));
     }
 
-    @PostMapping("/login")
+    @PostMapping(LOGIN)
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         AuthResponse response = authService.login(request);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping(RESEND_VERIFICATION)
+    public ResponseEntity<?> resendVerification(@RequestBody Map<String, String> body){
+        String email = body.get("email");
+
+        if (Objects.isNull(email)){
+            return ResponseEntity.badRequest().body(Map.of("message", "Email is required"));
+        }
+
+        authService.resendVerification(email);
+
+        return ResponseEntity.ok(Map.of("success", true, "message", "Verification is sent"));
+    }
+
+
+    @PostMapping(PROFILE)
+    public ResponseEntity<?> getProfile(Authentication authentication){
+        Object principal = authentication.getPrincipal();
+
+        AuthResponse currentProfile = authService.getProfile(principal);
+
+        return ResponseEntity.ok(currentProfile);
     }
 
 }
