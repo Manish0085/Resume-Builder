@@ -1,14 +1,18 @@
 package com.build.resume.service.impl;
 
 import com.build.resume.dto.AuthResponse;
+import com.build.resume.dto.LoginRequest;
 import com.build.resume.dto.RegisterRequest;
 import com.build.resume.entity.User;
 import com.build.resume.exception.ResourceExistsException;
 import com.build.resume.repository.UserRepository;
 import com.build.resume.service.AuthService;
+import com.build.resume.util.JwtUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,11 +23,15 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepo;
     private final EmailService emailService;
+    public final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
 
-    public AuthServiceImpl(UserRepository userRepo, EmailService emailService) {
+    public AuthServiceImpl(UserRepository userRepo, EmailService emailService, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.userRepo = userRepo;
+        this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
+        this.jwtUtil = jwtUtil;
     }
 
     @Value("${app.base.url:http://localhost:8081}")
@@ -84,7 +92,7 @@ public class AuthServiceImpl implements AuthService {
         User user = new User();
         user.setName(request.getName());
         user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setProfileImageUrl(request.getProfileImageUrl());
         user.setSubscriptionPlan("Basic");
         user.setEmailVerified(false);
@@ -109,6 +117,25 @@ public class AuthServiceImpl implements AuthService {
         user.setVerificationExpires(null);
         userRepo.save(user);
 
+    }
+
+    @Override
+    public AuthResponse login(LoginRequest request){
+        User existUser = userRepo.findByEmail(request.getEmail())
+                .orElseThrow(() -> new UsernameNotFoundException("Invalid email or password"));
+        if (!passwordEncoder.matches(request.getPassword(), existUser.getPassword())){
+            throw new UsernameNotFoundException("Invalid email or password");
+        }
+
+        if (!existUser.isEmailVerified()){
+            throw new RuntimeException("Email not verified. Please verify your email before logging in.");
+        }
+        String token = jwtUtil.generateToken(existUser.getId());
+
+        AuthResponse response = toResponse(existUser);
+        response.setToken(token);
+
+        return response;
     }
 
 }

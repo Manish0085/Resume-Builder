@@ -1,8 +1,10 @@
 package com.build.resume.controller;
 
 import com.build.resume.dto.AuthResponse;
+import com.build.resume.dto.LoginRequest;
 import com.build.resume.dto.RegisterRequest;
 import com.build.resume.service.AuthService;
+import com.build.resume.service.impl.FileUploadService;
 import com.build.resume.util.AppConstants;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -13,8 +15,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.build.resume.util.AppConstants.*;
 
@@ -23,9 +28,11 @@ import static com.build.resume.util.AppConstants.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final FileUploadService fileUploadService;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, FileUploadService fileUploadService) {
         this.authService = authService;
+        this.fileUploadService = fileUploadService;
     }
 
     private final Logger logger = LoggerFactory.getLogger(AuthController.class);
@@ -49,6 +56,17 @@ public class AuthController {
     }
 
 
+    @PostMapping(UPLOAD_IMAGE)
+    public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile file) throws IOException {
+        logger.info("Inside AuthController - uploadImage()");
+        Map<String, String> response = fileUploadService.uploadSingleImage(file);
+        return ResponseEntity.of(Optional.ofNullable(response));
+    }
 
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
+        AuthResponse response = authService.login(request);
+        return ResponseEntity.ok(response);
+    }
 
 }

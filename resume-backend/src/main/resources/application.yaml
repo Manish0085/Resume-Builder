@@ -40,7 +40,9 @@ logging:
     org.springframework: INFO
     org.hibernate.SQL: DEBUG
 
+# =====================
 # Custom App Properties
+# =====================
 app:
   email:
     from: manishk57107@gmail.com
@@ -49,10 +51,18 @@ app:
   base:
     url: http://localhost:8081
 
+# =====================
+# Cloudinary Configuration
+# =====================
+cloudinary:
+  cloud-name: ${CLOUDINARY_CLOUD_NAME}
+  api-key: ${CLOUDINARY_API_KEY}
+  api-secret: ${CLOUDINARY_API_SECRET}
+  secure: true
 
-
-
-
-
-
-
+# =====================
+# JWT Configuration
+# =====================
+jwt:
+  secret: ${JWT_SECRET}          # Store securely in environment variables
+  expiration: 86400000           # in milliseconds (1 day = 24 * 60 * 60 * 1000)
