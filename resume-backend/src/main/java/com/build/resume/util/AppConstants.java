@@ -15,4 +15,9 @@ public class AppConstants {
     public static final String UPLOAD_IMAGES = "/{id}/upload-images";
     public static final String TEMPLATE = "/api/templates";
     public static final String PREMIUM = "premium";
+    public static final String PAYMENT = "/api/payment";
+    public static final String CREATE_ORDER = "/create-order";
+    public static final String VERIFY_PAYMENT = "/verify-payment";
+    public static final String HISTORY = "history";
+    public static final String ORDER = "/order/{orderId}";
 }

@@ -13,8 +13,8 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update   # options: none | update | create | create-drop
-    show-sql: true       # logs SQL queries in console
+      ddl-auto: update
+    show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
@@ -23,7 +23,7 @@ spring:
     host: smtp-relay.brevo.com
     port: 587
     username: ${BREVO_USERNAME}
-    password: ${BREVO_PASSWORD}   # stored securely in environment variable
+    password: ${BREVO_PASSWORD}
     properties:
       mail:
         smtp:
@@ -64,5 +64,14 @@ cloudinary:
 # JWT Configuration
 # =====================
 jwt:
-  secret: ${JWT_SECRET}          # Store securely in environment variables
-  expiration: 86400000           # in milliseconds (1 day = 24 * 60 * 60 * 1000)
+  secret: ${JWT_SECRET}
+  expiration: 86400000
+
+# =====================
+# Razorpay Configuration
+# =====================
+razorpay:
+  key-id: ${RAZORPAY_KEY_ID}
+  key-secret: ${RAZORPAY_KEY_SECRET}
+  currency: INR
+  payment-capture: true   # auto-capture payment after authorization
